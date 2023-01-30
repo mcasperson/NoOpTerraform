@@ -11,11 +11,6 @@
 #
 # Get a trial Octopus instance from https://octopus.com/start
 
-permissions:
-  id-token: write
-  contents: write
-  checks: write
-
 name: Generic Build
 'on':
   workflow_dispatch: {}
@@ -28,12 +23,12 @@ jobs:
         with:
           fetch-depth: '0'
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.14
+        uses: gittools/actions/gitversion/setup@v0.9.15
         with:
           versionSpec: 5.x
       - id: determine_version
         name: Determine Version
-        uses: gittools/actions/gitversion/execute@v0.9.14
+        uses: gittools/actions/gitversion/execute@v0.9.15
         with:
           additionalArguments: /overrideconfig mode=Mainline
       - name: Install Octopus Deploy CLI
@@ -50,7 +45,7 @@ jobs:
            --include '**/*'
         shell: bash
       - name: Tag Release
-        uses: mathieudutour/github-tag-action@v6.0
+        uses: mathieudutour/github-tag-action@v6.1
         with:
           custom_tag: ${{ steps.determine_version.outputs.semVer }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -77,15 +72,15 @@ jobs:
         uses: OctopusDeploy/push-package-action@v2
         env:
           OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_TOKEN }}
-          OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER_URL }}
+          OCTOPUS_URL: ${{ secrets.OCTOPUS_SERVER_URL }}
         with:
           packages: NoOpTerraform.${{ steps.determine_version.outputs.semVer }}.zip
           overwrite_mode: OverwriteExisting
       - name: Generate Octopus Deploy build information
-        uses: OctopusDeploy/push-build-information-action@v1
+        uses: OctopusDeploy/push-build-information-action@v3
         env:
           OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_TOKEN }}
-          OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER_URL }}
+          OCTOPUS_URL: ${{ secrets.OCTOPUS_SERVER_URL }}
         with:
           version: ${{ steps.determine_version.outputs.semVer }}
           packages: NoOpTerraform
@@ -98,3 +93,7 @@ jobs:
           server: ${{ secrets.OCTOPUS_SERVER_URL }}
           deploy_to: Development
           packages: NoOpTerraform:${{ steps.determine_version.outputs.semVer }}
+permissions:
+  id-token: write
+  checks: write
+  contents: write
