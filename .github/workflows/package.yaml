@@ -72,7 +72,7 @@ jobs:
         uses: OctopusDeploy/push-package-action@v2
         env:
           OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_TOKEN }}
-          OCTOPUS_URL: ${{ secrets.OCTOPUS_SERVER_URL }}
+          OCTOPUS_CLI_SERVER: ${{ secrets.OCTOPUS_SERVER_URL }}
         with:
           packages: NoOpTerraform.${{ steps.determine_version.outputs.semVer }}.zip
           overwrite_mode: OverwriteExisting
