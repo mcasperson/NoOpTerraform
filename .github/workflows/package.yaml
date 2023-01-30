@@ -11,6 +11,11 @@
 #
 # Get a trial Octopus instance from https://octopus.com/start
 
+permissions:
+  id-token: write
+  contents: write
+  checks: write
+
 name: Generic Build
 'on':
   workflow_dispatch: {}
